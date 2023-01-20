@@ -46,10 +46,12 @@ dt1 = data.reset_index()
 dt2 = data1.reset_index()
 dt = pd.merge(dt1, dt2)
 dt
+#dropping the column
 dt.drop(['EG.USE.ELEC.KH.PC'], axis = 1, inplace = True)
 dt.drop(['EG.ELC.ACCS.ZS'], axis = 1, inplace = True)
 dt
 dt["Year"] = pd.to_numeric(dt["Year"])
+#function to normalise the data
 def norm_df(df):
     y = df.iloc[:,2:]
     df.iloc[:,2:] = (y-y.min())/ (y.max() - y.min())
@@ -60,7 +62,9 @@ df_fit = dt_norm.drop('Country', axis = 1)
 k = KMeans(n_clusters=2, init='k-means++', random_state=0).fit(df_fit)
 sns.scatterplot(data=dt_norm, x="Country", y="EN.ATM.CO2E.PC", hue=k.labels_)
 plt.legend()
+plt.savefig("plot.png")
 plt.show()
+#function to find the error
 def err_ranges(x, func, param, sigma):
 #initiate arrays for lower and upper limits
   lower = func(x, *param)
@@ -79,6 +83,7 @@ def err_ranges(x, func, param, sigma):
   return lower, upper
 dt1 = dt[(dt['Country'] == 'AUS')]
 dt1
+#curve fitting for Australia
 val = dt1.values
 x, y = val[:, 1], val[:, 2]
 def fct(x, a, b, c):
@@ -94,15 +99,19 @@ plt.xlabel('Year')
 plt.ylabel('CO2 emissions')
 plt.title("CO2 emission rate in Australia")
 plt.legend(loc='best', fancybox=True, shadow=True)
+plt.savefig("aus.png")
 plt.show()
+#extracting the sigma
 sigma = np.sqrt(np.diag(cov))
 print(sigma)
 low, up = err_ranges(x, fct, prmet, sigma)
+#finding the emission rate in the coming 10 years
 print("Forcasted CO2 emission")
 low, up = err_ranges(2030, fct, prmet, sigma)
 print("2030 between", low, "and", up)
 dt2 = dt[(dt['Country'] == 'CAN')]
 dt2
+#curve fitting for china
 val2 = dt2.values
 x2, y2 = val2[:, 1], val2[:, 2]
 def fct(x, a, b, c):
@@ -118,15 +127,19 @@ plt.xlabel('Year')
 plt.ylabel('CO2 emissions')
 plt.title("CO2 emission rate in Canada")
 plt.legend(loc='best', fancybox=True, shadow=True)
+plt.savefig("can.png")
 plt.show()
+#extracting the sigma
 sigma = np.sqrt(np.diag(cov))
 print(sigma)
 low, up = err_ranges(x2, fct, prmet, sigma)
+#finding the emission rate in the coming 10 years
 print("Forcasted CO2 emission")
 low, up = err_ranges(2030, fct, prmet, sigma)
 print("2030 between", low, "and", up)
 dt3 = dt[(dt['Country'] == 'ETH')]
 dt3
+#curve fitting for Ethiopia
 val3 = dt3.values
 x3, y3 = val3[:, 1], val3[:, 2]
 def fct(x, a, b, c):
@@ -142,10 +155,13 @@ plt.xlabel('Year')
 plt.ylabel('CO2 emissions')
 plt.title("CO2 emission rate in Ethiopia")
 plt.legend(loc='best', fancybox=True, shadow=True)
+plt.savefig("eth.png")
 plt.show()
+#extracting the sigma
 sigma = np.sqrt(np.diag(cov))
 print(sigma)
 low, up = err_ranges(x3, fct, prmet, sigma)
+#finding the emission rate in the coming 10 years
 print("Forcasted CO2 emission")
 low, up = err_ranges(2030, fct, prmet, sigma)
 print("2030 between", low, "and", up)
